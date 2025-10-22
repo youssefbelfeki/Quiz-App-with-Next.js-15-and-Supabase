@@ -10,7 +10,6 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
@@ -20,7 +19,6 @@ import { useAuth, AuthGuard } from "@/lib/auth";
 const { Header, Content, Footer } = Layout;
 
 function AppHeader() {
-   const pathname = usePathname();
    const { user, signOut } = useAuth();
 
   const userMenu = [
