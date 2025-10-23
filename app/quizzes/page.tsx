@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Typography, Row, Col, Spin, Pagination, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Typography, Row, Col, Spin, Pagination, Button, Input } from "antd";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { useQuizzes } from "@/api/hooks/useQuizzes";
 import { useAuth } from "@/lib/auth";
-import { QuizCard } from "../components/quizzes/QuizCard";
+import Link from "next/link";
+import { QuizCard } from "@/components/quizzes/QuizCard";
 
-const QuizzesPage = () => {
-  const { Title, Paragraph } = Typography;
+const { Title, Paragraph } = Typography;
+
+export default function QuizzesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const pageSize = 9; // 3 quizzes per row, 3 rows
@@ -19,7 +22,67 @@ const QuizzesPage = () => {
     isLoading,
     error,
     isFetching,
-  } = useQuizzes(currentPage, pageSize, true, searchTerm); // Pass true to indicate this can be a public routes
+  } = useQuizzes(currentPage, pageSize, true, searchTerm); // Pass true to indicate this can be a public route
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex justify-center items-center">
+        <div className="text-center">
+          <Title level={4} className="text-red-500 mb-4">
+            Oops! Something went wrong
+          </Title>
+          <Paragraph className="text-gray-600">
+            Please try again later.
+          </Paragraph>
+        </div>
+      </div>
+    );
+  }
+
+  const quizzes = paginatedQuizzes?.data || [];
+  const total = paginatedQuizzes?.total || 0;
+
+  if (!isLoading && quizzes.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="text-center py-20">
+            <div className="mb-8">
+              <div className="w-32 h-32 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-6xl">📚</span>
+              </div>
+              <Title level={2} className="mb-4 text-gray-800">
+                No quizzes found
+              </Title>
+              <Paragraph className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+                {user
+                  ? "Ready to create your first quiz? Let's get started!"
+                  : "Discover amazing quizzes created by our community!"}
+              </Paragraph>
+            </div>
+            {user && (
+              <Link href="/quizzes/new">
+                <Button
+                  type="primary"
+                  size="large"
+                  icon={<PlusOutlined />}
+                  className="h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-600 border-0 rounded-2xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                >
+                  Create Your First Quiz
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -125,6 +188,4 @@ const QuizzesPage = () => {
       </div>
     </div>
   );
-};
-
-export default QuizzesPage;
+}

@@ -19,7 +19,7 @@ import { useAuth, AuthGuard } from "@/lib/auth";
 const { Header, Content, Footer } = Layout;
 
 function AppHeader() {
-   const { user, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const userMenu = [
     {
